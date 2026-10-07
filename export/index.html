@@ -10,7 +10,6 @@
 </head>
 <body>
     <div class="mono-app">
-        <!-- MINIMALIST ARCHITECTURAL HEADER -->
         <header class="mono-header">
             <div class="mono-brand">
                 <div class="mono-logo">&lambda;</div>
@@ -25,7 +24,6 @@
             </div>
         </header>
 
-        <!-- 3D INTERACTIVE MONOCHROME VIEWPORT -->
         <section class="mono-viewport-card">
             <div class="mono-viewport-bar">
                 <div class="mono-viewport-title">
@@ -52,7 +50,6 @@
             </div>
         </section>
 
-        <!-- MINIMALIST STATS HUD -->
         <section class="mono-stats-grid">
             <div class="mono-stat-box">
                 <div class="mono-stat-label">Ingested Raw Tokens</div>
@@ -81,7 +78,6 @@
             </div>
         </section>
 
-        <!-- CODE WORKBENCH & INGESTION -->
         <section class="mono-workbench">
             <div class="mono-box">
                 <div class="mono-bar">
@@ -112,7 +108,6 @@
                 </div>
             </div>
 
-            <!-- THEORETICAL INVARIANTS PANEL -->
             <div class="mono-box" style="padding: 1.6rem; display: flex; flex-direction: column; justify-content: space-between;">
                 <div>
                     <div style="font-family: var(--font-mono); font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-white); margin-bottom: 0.8rem;">
@@ -135,7 +130,6 @@
             </div>
         </section>
 
-        <!-- MINIMALIST DATA TABS -->
         <section class="mono-data-panel">
             <nav class="mono-tab-nav">
                 <button class="mono-tab-item active" onclick="switchTab('keywords')">Unique Keywords (std::set)</button>
@@ -145,7 +139,6 @@
                 <button class="mono-tab-item" onclick="switchTab('terminal')">C++ Binary Output</button>
             </nav>
 
-            <!-- TAB 1: UNIQUE KEYWORDS -->
             <div id="tab-keywords" class="mono-tab-pane active">
                 <div class="mono-table-bar">
                     <h3>Lexicographically Sorted Syntax Keywords Isolated by std::set</h3>
@@ -170,7 +163,6 @@
                 </div>
             </div>
 
-            <!-- TAB 2: SYNTAX CATEGORIZATION -->
             <div id="tab-categories" class="mono-tab-pane">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                     <div>
@@ -216,7 +208,6 @@
                 </div>
             </div>
 
-            <!-- TAB 3: LOGARITHMIC BOUNDS & BENCHMARKS -->
             <div id="tab-benchmarks" class="mono-tab-pane">
                 <div class="mono-table-bar">
                     <h3>Empirical Complexity Evaluation: std::set vs Vector Linear Search</h3>
@@ -242,7 +233,6 @@
                 </div>
             </div>
 
-            <!-- TAB 4: TOKEN STREAM EXPLORER -->
             <div id="tab-tokens" class="mono-tab-pane">
                 <div class="mono-table-bar">
                     <h3>Raw Ingested Tokens Sequence (std::vector&lt;std::string&gt;)</h3>
@@ -253,7 +243,6 @@
                 </div>
             </div>
 
-            <!-- TAB 5: CLI TERMINAL LOG -->
             <div id="tab-terminal" class="mono-tab-pane">
                 <div class="mono-table-bar">
                     <h3>Native C++ Executable Terminal Log</h3>
@@ -262,14 +251,12 @@
             </div>
         </section>
 
-        <!-- MINIMALIST FOOTER -->
         <footer class="mono-footer">
             <div>Group 5 &bull; Compiler Syntax Token Unique Extractor &amp; Categorizer</div>
             <div>STL std::set&lt;std::string&gt; &bull; std::vector&lt;std::string&gt;</div>
         </footer>
     </div>
 
-    <!-- LOCAL THREE.JS ENGINE & APPLICATION LOGIC -->
     <script src="three.min.js"></script>
     <script src="app.js"></script>
 </body>

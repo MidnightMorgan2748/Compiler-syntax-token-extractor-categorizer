@@ -53,7 +53,6 @@ std::vector<Token> Tokenizer::tokenizeDetailed(const std::string& sourceCode,
     while (i < len) {
         char c = sourceCode[i];
 
-        // 1. Handle Whitespace & Newlines
         if (c == '\r') {
             i++;
             if (i < len && sourceCode[i] == '\n') {
@@ -72,9 +71,7 @@ std::vector<Token> Tokenizer::tokenizeDetailed(const std::string& sourceCode,
             continue;
         }
 
-        // 2. Preprocessor Directives (#...)
         if (c == '#' && (getCol(i) == 1 || [&]() {
-            // Check if only whitespace before # on current line
             for (size_t k = lineStartPos; k < i; ++k) {
                 if (!std::isspace(static_cast<unsigned char>(sourceCode[k]))) return false;
             }
@@ -82,7 +79,6 @@ std::vector<Token> Tokenizer::tokenizeDetailed(const std::string& sourceCode,
         }())) {
             size_t startCol = getCol(i);
             size_t startIdx = i;
-            // Read until end of line (handling \ line continuations)
             while (i < len) {
                 if (sourceCode[i] == '\\' && i + 1 < len && (sourceCode[i + 1] == '\n' || sourceCode[i + 1] == '\r')) {
                     if (sourceCode[i + 1] == '\r' && i + 2 < len && sourceCode[i + 2] == '\n') {
@@ -105,7 +101,6 @@ std::vector<Token> Tokenizer::tokenizeDetailed(const std::string& sourceCode,
             continue;
         }
 
-        // 3. Comments (// or /* ... */)
         if (c == '/' && i + 1 < len) {
             if (sourceCode[i + 1] == '/') {
                 size_t startCol = getCol(i);
@@ -131,7 +126,7 @@ std::vector<Token> Tokenizer::tokenizeDetailed(const std::string& sourceCode,
                     i++;
                 }
                 if (i + 1 < len) {
-                    i += 2; // skip */
+                    i += 2;
                 } else {
                     i = len;
                 }
@@ -143,13 +138,12 @@ std::vector<Token> Tokenizer::tokenizeDetailed(const std::string& sourceCode,
             }
         }
 
-        // 4. String Literals ("...")
         if (c == '"') {
             size_t startCol = getCol(i);
             size_t startIdx = i++;
             while (i < len && sourceCode[i] != '"') {
                 if (sourceCode[i] == '\\' && i + 1 < len) {
-                    i += 2; // skip escape character
+                    i += 2;
                 } else {
                     if (sourceCode[i] == '\n') {
                         currentLine++;
@@ -159,14 +153,13 @@ std::vector<Token> Tokenizer::tokenizeDetailed(const std::string& sourceCode,
                 }
             }
             if (i < len && sourceCode[i] == '"') {
-                i++; // closing quote
+                i++;
             }
             std::string strLit = sourceCode.substr(startIdx, i - startIdx);
             tokens.emplace_back(strLit, TokenType::STRING_LITERAL, currentLine, startCol);
             continue;
         }
 
-        // 5. Character Literals ('.')
         if (c == '\'') {
             size_t startCol = getCol(i);
             size_t startIdx = i++;
@@ -185,7 +178,6 @@ std::vector<Token> Tokenizer::tokenizeDetailed(const std::string& sourceCode,
             continue;
         }
 
-        // 6. Identifiers and Keywords
         if (std::isalpha(static_cast<unsigned char>(c)) || c == '_') {
             size_t startCol = getCol(i);
             size_t startIdx = i++;
@@ -196,33 +188,27 @@ std::vector<Token> Tokenizer::tokenizeDetailed(const std::string& sourceCode,
             if (ident == "true" || ident == "false") {
                 tokens.emplace_back(ident, TokenType::BOOLEAN_LITERAL, currentLine, startCol);
             } else {
-                // We initially mark identifiers; KeywordExtractor will accurately classify keywords
-                // or we can detect known keywords here.
                 tokens.emplace_back(ident, TokenType::IDENTIFIER, currentLine, startCol);
             }
             continue;
         }
 
-        // 7. Numbers (Integers & Floating-point)
         if (std::isdigit(static_cast<unsigned char>(c)) || (c == '.' && i + 1 < len && std::isdigit(static_cast<unsigned char>(sourceCode[i + 1])))) {
             size_t startCol = getCol(i);
             size_t startIdx = i;
             bool isFloat = (c == '.');
 
             if (c == '0' && i + 1 < len && (sourceCode[i + 1] == 'x' || sourceCode[i + 1] == 'X')) {
-                // Hexadecimal
                 i += 2;
                 while (i < len && (std::isxdigit(static_cast<unsigned char>(sourceCode[i])) || sourceCode[i] == '\'')) {
                     i++;
                 }
             } else if (c == '0' && i + 1 < len && (sourceCode[i + 1] == 'b' || sourceCode[i + 1] == 'B')) {
-                // Binary
                 i += 2;
                 while (i < len && (sourceCode[i] == '0' || sourceCode[i] == '1' || sourceCode[i] == '\'')) {
                     i++;
                 }
             } else {
-                // Decimal or float
                 while (i < len && (std::isdigit(static_cast<unsigned char>(sourceCode[i])) || sourceCode[i] == '\'')) {
                     i++;
                 }
@@ -233,7 +219,6 @@ std::vector<Token> Tokenizer::tokenizeDetailed(const std::string& sourceCode,
                         i++;
                     }
                 }
-                // Exponent part (e or E)
                 if (i < len && (sourceCode[i] == 'e' || sourceCode[i] == 'E')) {
                     isFloat = true;
                     i++;
@@ -245,7 +230,6 @@ std::vector<Token> Tokenizer::tokenizeDetailed(const std::string& sourceCode,
                     }
                 }
             }
-            // Suffixes: f, F, l, L, u, U, ll, ull
             while (i < len && (std::isalpha(static_cast<unsigned char>(sourceCode[i])))) {
                 i++;
             }
@@ -255,9 +239,7 @@ std::vector<Token> Tokenizer::tokenizeDetailed(const std::string& sourceCode,
             continue;
         }
 
-        // 8. Multi-character Operators and Punctuation
         size_t startCol = getCol(i);
-        // Check for 3-character operators
         if (i + 2 < len) {
             std::string op3 = sourceCode.substr(i, 3);
             if (op3 == "..." || op3 == "<<=" || op3 == ">>=" || op3 == "<=>" || op3 == "->*") {
@@ -266,7 +248,6 @@ std::vector<Token> Tokenizer::tokenizeDetailed(const std::string& sourceCode,
                 continue;
             }
         }
-        // Check for 2-character operators
         if (i + 1 < len) {
             std::string op2 = sourceCode.substr(i, 2);
             static const std::unordered_set<std::string> twoCharOps = {
@@ -280,21 +261,18 @@ std::vector<Token> Tokenizer::tokenizeDetailed(const std::string& sourceCode,
             }
         }
 
-        // 9. Single-character Punctuation
         if (isPunctuationChar(c)) {
             tokens.emplace_back(std::string(1, c), TokenType::PUNCTUATION, currentLine, startCol);
             i++;
             continue;
         }
 
-        // 10. Single-character Operator
         if (isOperatorChar(c)) {
             tokens.emplace_back(std::string(1, c), TokenType::OPERATOR, currentLine, startCol);
             i++;
             continue;
         }
 
-        // 11. Unknown / Fallback
         tokens.emplace_back(std::string(1, c), TokenType::UNKNOWN, currentLine, startCol);
         i++;
     }

@@ -1,4 +1,3 @@
-// Sample 3: Keywords Stress & High Duplicate Rejection Ratio
 #include <iostream>
 
 int calculate(int a, int b) {

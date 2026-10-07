@@ -4,13 +4,6 @@
 #include <string_view>
 #include <iostream>
 
-/**
- * @file Token.hpp
- * @brief Token types, keyword categories, and Token structure definitions.
- * 
- * Part of Group 5: Compiler Syntax Token Unique Extractor & Categorizer
- */
-
 enum class TokenType {
     KEYWORD,
     IDENTIFIER,
@@ -27,14 +20,14 @@ enum class TokenType {
 };
 
 enum class KeywordCategory {
-    CONTROL_FLOW,          // if, else, switch, case, default, while, do, for, break, continue, return, goto
-    DATA_TYPE,             // int, char, float, double, void, bool, short, long, signed, unsigned, wchar_t, auto
-    MODIFIER_STORAGE,      // const, volatile, static, extern, register, mutable, constexpr, inline, consteval, constinit
-    CLASS_STRUCT_ACCESS,   // class, struct, union, enum, public, private, protected, friend, virtual, override, final
-    MEMORY_EXCEPTION,      // new, delete, this, try, catch, throw, noexcept, nullptr
-    TEMPLATE_CAST_SPEC,    // template, typename, namespace, using, static_cast, dynamic_cast, const_cast, reinterpret_cast, typeid, sizeof, decltype
-    CONCURRENCY,           // thread_local, co_await, co_return, co_yield
-    OTHER_KEYWORD,         // asm, explicit, export, etc.
+    CONTROL_FLOW,
+    DATA_TYPE,
+    MODIFIER_STORAGE,
+    CLASS_STRUCT_ACCESS,
+    MEMORY_EXCEPTION,
+    TEMPLATE_CAST_SPEC,
+    CONCURRENCY,
+    OTHER_KEYWORD,
     NOT_A_KEYWORD
 };
 
@@ -53,6 +46,5 @@ struct Token {
         : lexeme(std::move(lex)), type(t), keywordCategory(kwCat), line(ln), column(col) {}
 };
 
-// String conversion helper declarations
 std::string tokenTypeToString(TokenType type);
 std::string keywordCategoryToString(KeywordCategory category);

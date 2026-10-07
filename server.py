@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-"""
-Localhost Web Server for Compiler Syntax Token Unique Extractor & Categorizer
-Serves interactive Frontend on http://localhost:8080 and bridges to C++ backend executable.
-"""
-
 import http.server
 import socketserver
 import os
@@ -72,7 +66,6 @@ class ApiHandler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(json.dumps({"sampleId": sample_id, "code": code}).encode("utf-8"))
             return
 
-        # Default static file serving from web/
         return super().do_GET()
 
     def do_POST(self):
@@ -93,7 +86,6 @@ class ApiHandler(http.server.SimpleHTTPRequestHandler):
                 with open(temp_cpp, "w", encoding="utf-8") as f:
                     f.write(code)
 
-                # Execute C++ syntax_analyzer.exe
                 cmd = [BIN_EXE, "--file", temp_cpp, "--json", temp_json]
                 result = subprocess.run(cmd, capture_output=True, text=True, cwd=BASE_DIR)
 
@@ -124,7 +116,6 @@ class ApiHandler(http.server.SimpleHTTPRequestHandler):
 
         elif path == "/api/benchmark":
             try:
-                # Trigger benchmark in C++ binary
                 cmd = [BIN_EXE, "--demo"]
                 subprocess.run(cmd, capture_output=True, text=True, cwd=BASE_DIR)
 

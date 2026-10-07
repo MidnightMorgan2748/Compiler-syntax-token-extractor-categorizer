@@ -15,13 +15,11 @@ set(COMMON_SOURCES
     src/JsonExporter.cpp
 )
 
-# Main Executable
 add_executable(syntax_analyzer
     src/main.cpp
     ${COMMON_SOURCES}
 )
 
-# Test Suite Executable
 add_executable(test_runner
     tests/test_runner.cpp
     ${COMMON_SOURCES}

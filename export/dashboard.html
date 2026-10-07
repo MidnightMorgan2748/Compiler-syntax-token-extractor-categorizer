@@ -72,7 +72,6 @@
         <button class="tab-btn" onclick="switchTab('tokens')">Raw Ingested Tokens Stream</button>
     </div>
 
-    <!-- TAB 1: UNIQUE KEYWORDS -->
     <div id="tab-keywords" class="tab-content active">
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -97,7 +96,6 @@
         </div>
     </div>
 
-    <!-- TAB 2: SYNTAX CATEGORIZATION -->
     <div id="tab-categorization" class="tab-content">
         <div class="card" style="margin-bottom: 1.5rem;">
             <h3>Overall Syntax Categorization Breakdown</h3>
@@ -129,7 +127,6 @@
         </div>
     </div>
 
-    <!-- TAB 3: LOGARITHMIC BOUNDS & BENCHMARKS -->
     <div id="tab-complexity" class="tab-content">
         <div class="card" style="margin-bottom: 1.5rem;">
             <h3>Theoretical & Empirical Validation of std::set Logarithmic Bounds</h3>
@@ -154,7 +151,6 @@
         </div>
     </div>
 
-    <!-- TAB 4: RAW TOKENS STREAM -->
     <div id="tab-tokens" class="tab-content">
         <div class="card">
             <h3>Ingested Token Stream (std::vector&lt;std::string&gt;)</h3>
@@ -168,11 +164,11 @@
   "group": "Group 5",
   "sourceName": "Default Built-in C++ Demo",
   "metrics": {
-    "totalTokensIngested": 228,
+    "totalTokensIngested": 226,
     "totalKeywordOccurrences": 38,
     "uniqueKeywordsCount": 24,
     "duplicateRejectionsCount": 14,
-    "keywordDensityPercentage": 16.67,
+    "keywordDensityPercentage": 16.81,
     "uniquenessRatio": 63.16,
     "duplicateSuppressionRatio": 36.84
   },
@@ -229,7 +225,7 @@
       "category": "Storage Class / Modifier",
       "frequency": 3,
       "relativeFrequencyPercentage": 7.89,
-      "streamPercentage": 1.32
+      "streamPercentage": 1.33
     },
     {
       "keyword": "continue",
@@ -271,7 +267,7 @@
       "category": "Data Type / Primitive",
       "frequency": 7,
       "relativeFrequencyPercentage": 18.42,
-      "streamPercentage": 3.07
+      "streamPercentage": 3.10
     },
     {
       "keyword": "namespace",
@@ -378,19 +374,19 @@
         "category": "KEYWORD",
         "totalCount": 38,
         "uniqueCount": 24,
-        "streamPercentage": 16.67
+        "streamPercentage": 16.81
       },
       {
         "category": "IDENTIFIER",
         "totalCount": 55,
         "uniqueCount": 22,
-        "streamPercentage": 24.12
+        "streamPercentage": 24.34
       },
       {
         "category": "INTEGER_LITERAL",
         "totalCount": 8,
         "uniqueCount": 5,
-        "streamPercentage": 3.51
+        "streamPercentage": 3.54
       },
       {
         "category": "STRING_LITERAL",
@@ -402,25 +398,19 @@
         "category": "OPERATOR",
         "totalCount": 45,
         "uniqueCount": 16,
-        "streamPercentage": 19.74
+        "streamPercentage": 19.91
       },
       {
         "category": "PUNCTUATION",
         "totalCount": 75,
         "uniqueCount": 8,
-        "streamPercentage": 32.89
+        "streamPercentage": 33.19
       },
       {
         "category": "PREPROCESSOR",
         "totalCount": 3,
         "uniqueCount": 3,
-        "streamPercentage": 1.32
-      },
-      {
-        "category": "COMMENT",
-        "totalCount": 2,
-        "uniqueCount": 2,
-        "streamPercentage": 0.88
+        "streamPercentage": 1.33
       }
     ],
     "keywordSubgroups": [
@@ -463,7 +453,6 @@
     ]
   },
   "rawTokens": [
-    "// Sample C++ Program for Compiler Syntax Token Extraction",
     "#include <iostream>",
     "#include <vector>",
     "#include <string>",
@@ -608,7 +597,6 @@
     "namespace",
     "ParserDemo",
     ";",
-    "// Allocate dynamic container",
     "DynamicContainer",
     "<",
     "int",
@@ -697,37 +685,37 @@
       "tokensN": 500,
       "uniqueU": 209,
       "estimatedTreeHeight": 16,
-      "vectorLinearTimeMs": 0.0880,
-      "setTimeMs": 0.0573,
-      "unorderedSetTimeMs": 0.0204,
-      "speedupVsVector": 1.54
+      "vectorLinearTimeMs": 0.3101,
+      "setTimeMs": 0.1667,
+      "unorderedSetTimeMs": 0.0613,
+      "speedupVsVector": 1.86
     },
     {
       "tokensN": 1500,
       "uniqueU": 491,
       "estimatedTreeHeight": 18,
-      "vectorLinearTimeMs": 0.4498,
-      "setTimeMs": 0.1322,
-      "unorderedSetTimeMs": 0.0434,
-      "speedupVsVector": 3.40
+      "vectorLinearTimeMs": 1.5487,
+      "setTimeMs": 0.4227,
+      "unorderedSetTimeMs": 0.1469,
+      "speedupVsVector": 3.66
     },
     {
       "tokensN": 5000,
       "uniqueU": 1542,
       "estimatedTreeHeight": 22,
-      "vectorLinearTimeMs": 3.3642,
-      "setTimeMs": 0.6115,
-      "unorderedSetTimeMs": 0.2004,
-      "speedupVsVector": 5.50
+      "vectorLinearTimeMs": 9.8417,
+      "setTimeMs": 1.2068,
+      "unorderedSetTimeMs": 0.5061,
+      "speedupVsVector": 8.16
     },
     {
       "tokensN": 15000,
       "uniqueU": 4595,
       "estimatedTreeHeight": 26,
-      "vectorLinearTimeMs": 29.7463,
-      "setTimeMs": 1.5967,
-      "unorderedSetTimeMs": 0.6778,
-      "speedupVsVector": 18.63
+      "vectorLinearTimeMs": 87.1978,
+      "setTimeMs": 3.9210,
+      "unorderedSetTimeMs": 1.6562,
+      "speedupVsVector": 22.24
     }
   ]
 }
@@ -772,10 +760,8 @@
             document.getElementById('metricDensity').innerText = d.metrics.keywordDensityPercentage + '%';
             document.getElementById('metricSuppression').innerText = d.metrics.duplicateSuppressionRatio + '%';
 
-            // Render Keywords
             renderKeywords(d.keywordFrequencies);
 
-            // Render Categories
             const catBody = document.getElementById('catTypeTableBody');
             catBody.innerHTML = '';
             d.syntaxCategorization.tokenTypes.forEach(t => {
@@ -798,7 +784,6 @@
                 </tr>`;
             });
 
-            // Render Benchmarks
             const bBody = document.getElementById('benchmarkTableBody');
             bBody.innerHTML = '';
             d.complexityBenchmarks.forEach(b => {
@@ -813,7 +798,6 @@
                 </tr>`;
             });
 
-            // Render Tokens
             const cloud = document.getElementById('tokenCloud');
             cloud.innerHTML = '';
             const kwSet = new Set(d.uniqueKeywordsLexicographical);

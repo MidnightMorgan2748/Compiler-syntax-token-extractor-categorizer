@@ -5,7 +5,6 @@ KeywordExtractor::KeywordExtractor() {}
 
 const std::unordered_map<std::string, KeywordCategory>& KeywordExtractor::getKeywordRegistry() {
     static const std::unordered_map<std::string, KeywordCategory> registry = {
-        // Control Flow
         {"if", KeywordCategory::CONTROL_FLOW},
         {"else", KeywordCategory::CONTROL_FLOW},
         {"switch", KeywordCategory::CONTROL_FLOW},
@@ -19,7 +18,6 @@ const std::unordered_map<std::string, KeywordCategory>& KeywordExtractor::getKey
         {"return", KeywordCategory::CONTROL_FLOW},
         {"goto", KeywordCategory::CONTROL_FLOW},
 
-        // Data Types / Primitives
         {"int", KeywordCategory::DATA_TYPE},
         {"char", KeywordCategory::DATA_TYPE},
         {"float", KeywordCategory::DATA_TYPE},
@@ -36,7 +34,6 @@ const std::unordered_map<std::string, KeywordCategory>& KeywordExtractor::getKey
         {"char8_t", KeywordCategory::DATA_TYPE},
         {"auto", KeywordCategory::DATA_TYPE},
 
-        // Storage Classes & Modifiers
         {"const", KeywordCategory::MODIFIER_STORAGE},
         {"volatile", KeywordCategory::MODIFIER_STORAGE},
         {"static", KeywordCategory::MODIFIER_STORAGE},
@@ -48,7 +45,6 @@ const std::unordered_map<std::string, KeywordCategory>& KeywordExtractor::getKey
         {"constinit", KeywordCategory::MODIFIER_STORAGE},
         {"inline", KeywordCategory::MODIFIER_STORAGE},
 
-        // OOP, Classes, Structs & Access
         {"class", KeywordCategory::CLASS_STRUCT_ACCESS},
         {"struct", KeywordCategory::CLASS_STRUCT_ACCESS},
         {"union", KeywordCategory::CLASS_STRUCT_ACCESS},
@@ -61,7 +57,6 @@ const std::unordered_map<std::string, KeywordCategory>& KeywordExtractor::getKey
         {"override", KeywordCategory::CLASS_STRUCT_ACCESS},
         {"final", KeywordCategory::CLASS_STRUCT_ACCESS},
 
-        // Memory & Exception Handling
         {"new", KeywordCategory::MEMORY_EXCEPTION},
         {"delete", KeywordCategory::MEMORY_EXCEPTION},
         {"this", KeywordCategory::MEMORY_EXCEPTION},
@@ -71,7 +66,6 @@ const std::unordered_map<std::string, KeywordCategory>& KeywordExtractor::getKey
         {"noexcept", KeywordCategory::MEMORY_EXCEPTION},
         {"nullptr", KeywordCategory::MEMORY_EXCEPTION},
 
-        // Templates, Casts, Types & Namespaces
         {"template", KeywordCategory::TEMPLATE_CAST_SPEC},
         {"typename", KeywordCategory::TEMPLATE_CAST_SPEC},
         {"namespace", KeywordCategory::TEMPLATE_CAST_SPEC},
@@ -89,13 +83,11 @@ const std::unordered_map<std::string, KeywordCategory>& KeywordExtractor::getKey
         {"concept", KeywordCategory::TEMPLATE_CAST_SPEC},
         {"requires", KeywordCategory::TEMPLATE_CAST_SPEC},
 
-        // Concurrency & Coroutines
         {"thread_local", KeywordCategory::CONCURRENCY},
         {"co_await", KeywordCategory::CONCURRENCY},
         {"co_return", KeywordCategory::CONCURRENCY},
         {"co_yield", KeywordCategory::CONCURRENCY},
 
-        // Other Standard Keywords
         {"asm", KeywordCategory::OTHER_KEYWORD},
         {"static_assert", KeywordCategory::OTHER_KEYWORD},
         {"alignas", KeywordCategory::OTHER_KEYWORD},
@@ -124,15 +116,11 @@ ExtractionResult KeywordExtractor::extract(const std::vector<std::string>& token
     result.totalKeywordOccurrences = 0;
     result.duplicateRejectionsCount = 0;
 
-    // Ingest and isolate unique keywords using std::set<std::string>
     for (const auto& token : tokens) {
         if (isKeyword(token)) {
             result.totalKeywordOccurrences++;
             result.keywordFrequencies[token]++;
 
-            // Demonstrating std::set unique insertion properties:
-            // insert() returns std::pair<iterator, bool>
-            // .second is true if new element was inserted, false if duplicate rejected
             auto [iter, inserted] = result.uniqueKeywords.insert(token);
             if (!inserted) {
                 result.duplicateRejectionsCount++;
@@ -142,7 +130,6 @@ ExtractionResult KeywordExtractor::extract(const std::vector<std::string>& token
 
     result.uniqueKeywordCount = result.uniqueKeywords.size();
 
-    // Calculate statistical metrics
     if (result.totalTokensIngested > 0) {
         result.keywordDensityPercentage = 
             (static_cast<double>(result.totalKeywordOccurrences) / result.totalTokensIngested) * 100.0;
@@ -160,7 +147,6 @@ ExtractionResult KeywordExtractor::extract(const std::vector<std::string>& token
         result.duplicateSuppressionRatio = 0.0;
     }
 
-    // Populate detailed metrics in lexicographical order (from std::set traversal)
     for (const auto& kw : result.uniqueKeywords) {
         size_t freq = result.keywordFrequencies[kw];
         double relFreq = (result.totalKeywordOccurrences > 0)

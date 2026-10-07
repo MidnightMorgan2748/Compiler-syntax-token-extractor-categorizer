@@ -47,7 +47,6 @@ bool JsonExporter::exportAnalysis(const std::string& outputPath,
     out << "  \"group\": \"Group 5\",\n";
     out << "  \"sourceName\": \"" << escapeJsonString(sourceName) << "\",\n";
     
-    // 1. Summary Metrics
     out << "  \"metrics\": {\n";
     out << "    \"totalTokensIngested\": " << extractionResult.totalTokensIngested << ",\n";
     out << "    \"totalKeywordOccurrences\": " << extractionResult.totalKeywordOccurrences << ",\n";
@@ -58,7 +57,6 @@ bool JsonExporter::exportAnalysis(const std::string& outputPath,
     out << "    \"duplicateSuppressionRatio\": " << extractionResult.duplicateSuppressionRatio << "\n";
     out << "  },\n";
 
-    // 2. Lexicographically Sorted Unique Keywords (std::set)
     out << "  \"uniqueKeywordsLexicographical\": [\n";
     size_t kwIdx = 0;
     for (const auto& kw : extractionResult.uniqueKeywords) {
@@ -66,7 +64,6 @@ bool JsonExporter::exportAnalysis(const std::string& outputPath,
     }
     out << "  ],\n";
 
-    // 3. Detailed Keyword Frequency Table
     out << "  \"keywordFrequencies\": [\n";
     for (size_t i = 0; i < extractionResult.detailedMetrics.size(); ++i) {
         const auto& m = extractionResult.detailedMetrics[i];
@@ -80,7 +77,6 @@ bool JsonExporter::exportAnalysis(const std::string& outputPath,
     }
     out << "  ],\n";
 
-    // 4. Categorization Report
     out << "  \"syntaxCategorization\": {\n";
     out << "    \"tokenTypes\": [\n";
     size_t ttIdx = 0;
@@ -111,14 +107,12 @@ bool JsonExporter::exportAnalysis(const std::string& outputPath,
     out << "\n    ]\n";
     out << "  },\n";
 
-    // 5. Ingested Raw Tokens Sequence (std::vector<std::string>)
     out << "  \"rawTokens\": [\n";
     for (size_t i = 0; i < rawTokens.size(); ++i) {
         out << "    \"" << escapeJsonString(rawTokens[i]) << "\"" << (i + 1 < rawTokens.size() ? "," : "") << "\n";
     }
     out << "  ],\n";
 
-    // 6. Empirical Complexity Benchmarks
     out << "  \"complexityBenchmarks\": [\n";
     for (size_t i = 0; i < benchmarkRows.size(); ++i) {
         const auto& b = benchmarkRows[i];
@@ -145,7 +139,6 @@ bool JsonExporter::exportHtmlDashboard(const std::string& htmlOutputPath,
     std::string embeddedJson = "{}";
     std::ifstream jsonIn(jsonFileName);
     if (!jsonIn.is_open()) {
-        // try prefixing directory if not found
         std::ifstream jsonInAlt("export/" + jsonFileName);
         if (jsonInAlt.is_open()) {
             std::stringstream ss;
@@ -235,7 +228,6 @@ bool JsonExporter::exportHtmlDashboard(const std::string& htmlOutputPath,
         <button class="tab-btn" onclick="switchTab('tokens')">Raw Ingested Tokens Stream</button>
     </div>
 
-    <!-- TAB 1: UNIQUE KEYWORDS -->
     <div id="tab-keywords" class="tab-content active">
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -260,7 +252,6 @@ bool JsonExporter::exportHtmlDashboard(const std::string& htmlOutputPath,
         </div>
     </div>
 
-    <!-- TAB 2: SYNTAX CATEGORIZATION -->
     <div id="tab-categorization" class="tab-content">
         <div class="card" style="margin-bottom: 1.5rem;">
             <h3>Overall Syntax Categorization Breakdown</h3>
@@ -292,7 +283,6 @@ bool JsonExporter::exportHtmlDashboard(const std::string& htmlOutputPath,
         </div>
     </div>
 
-    <!-- TAB 3: LOGARITHMIC BOUNDS & BENCHMARKS -->
     <div id="tab-complexity" class="tab-content">
         <div class="card" style="margin-bottom: 1.5rem;">
             <h3>Theoretical & Empirical Validation of std::set Logarithmic Bounds</h3>
@@ -317,7 +307,6 @@ bool JsonExporter::exportHtmlDashboard(const std::string& htmlOutputPath,
         </div>
     </div>
 
-    <!-- TAB 4: RAW TOKENS STREAM -->
     <div id="tab-tokens" class="tab-content">
         <div class="card">
             <h3>Ingested Token Stream (std::vector&lt;std::string&gt;)</h3>
@@ -368,10 +357,8 @@ bool JsonExporter::exportHtmlDashboard(const std::string& htmlOutputPath,
             document.getElementById('metricDensity').innerText = d.metrics.keywordDensityPercentage + '%';
             document.getElementById('metricSuppression').innerText = d.metrics.duplicateSuppressionRatio + '%';
 
-            // Render Keywords
             renderKeywords(d.keywordFrequencies);
 
-            // Render Categories
             const catBody = document.getElementById('catTypeTableBody');
             catBody.innerHTML = '';
             d.syntaxCategorization.tokenTypes.forEach(t => {
@@ -394,7 +381,6 @@ bool JsonExporter::exportHtmlDashboard(const std::string& htmlOutputPath,
                 </tr>`;
             });
 
-            // Render Benchmarks
             const bBody = document.getElementById('benchmarkTableBody');
             bBody.innerHTML = '';
             d.complexityBenchmarks.forEach(b => {
@@ -409,7 +395,6 @@ bool JsonExporter::exportHtmlDashboard(const std::string& htmlOutputPath,
                 </tr>`;
             });
 
-            // Render Tokens
             const cloud = document.getElementById('tokenCloud');
             cloud.innerHTML = '';
             const kwSet = new Set(d.uniqueKeywordsLexicographical);

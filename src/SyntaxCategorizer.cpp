@@ -7,7 +7,6 @@ CategorizationReport SyntaxCategorizer::categorize(const std::vector<Token>& tok
     CategorizationReport report{};
     report.totalTokens = tokens.size();
 
-    // Initialize map entries for standard types
     const std::vector<TokenType> allTypes = {
         TokenType::KEYWORD,
         TokenType::IDENTIFIER,
@@ -46,18 +45,15 @@ CategorizationReport SyntaxCategorizer::categorize(const std::vector<Token>& tok
         TokenType effectiveType = token.type;
         KeywordCategory effectiveKwCat = token.keywordCategory;
 
-        // Re-verify if an identifier is actually a keyword
         if (effectiveType == TokenType::IDENTIFIER && KeywordExtractor::isKeyword(token.lexeme)) {
             effectiveType = TokenType::KEYWORD;
             effectiveKwCat = KeywordExtractor::getCategory(token.lexeme);
         }
 
-        // Record under token type stats
         auto& tStat = report.tokenTypeStats[effectiveType];
         tStat.totalCount++;
-        tStat.uniqueLexemes.insert(token.lexeme); // std::set guarantees unique accumulation
+        tStat.uniqueLexemes.insert(token.lexeme);
 
-        // If it is a keyword, record under keyword subcategory
         if (effectiveType == TokenType::KEYWORD && effectiveKwCat != KeywordCategory::NOT_A_KEYWORD) {
             auto& kStat = report.keywordCategoryStats[effectiveKwCat];
             kStat.totalCount++;
@@ -65,7 +61,6 @@ CategorizationReport SyntaxCategorizer::categorize(const std::vector<Token>& tok
         }
     }
 
-    // Finalize counts and percentages
     for (auto& [type, stat] : report.tokenTypeStats) {
         stat.uniqueCount = stat.uniqueLexemes.size();
         if (report.totalTokens > 0) {
@@ -100,7 +95,7 @@ void SyntaxCategorizer::printFormattedReport(const CategorizationReport& report,
     os << "----------------------------------------------------------------------------------------\n";
 
     for (const auto& [type, stat] : report.tokenTypeStats) {
-        if (stat.totalCount == 0) continue; // Skip unencountered categories for brevity
+        if (stat.totalCount == 0) continue;
 
         std::string sample = "";
         size_t count = 0;

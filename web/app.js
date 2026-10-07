@@ -1,9 +1,4 @@
-// Minimalist Niche Monochromatic 3D Visualizer & Application Engine (Group 5)
-// Core STL: std::set<std::string>, std::vector<std::string>, Red-Black Tree Bounds
-// Strict Palette: Pure Black, Shades of Gray, Pure White
-
-const DEFAULT_DEMO = `// Default Demonstration C++ Program for Token Extraction
-#include <iostream>
+const DEFAULT_DEMO = `#include <iostream>
 #include <vector>
 #include <string>
 
@@ -62,9 +57,6 @@ int main(int argc, char* argv[]) {
 let currentAnalysis = null;
 let visualizerMode = 'tree';
 
-// =============================================================================
-// THREE.JS 3D MONOCHROMATIC ENGINE
-// =============================================================================
 let scene, camera, renderer;
 let treeGroup, vortexGroup;
 let isDragging = false;
@@ -89,7 +81,6 @@ function init3DVisualizer() {
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    // Pure White Lighting & Subtle Ambient Shadow
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.55);
     scene.add(ambientLight);
 
@@ -106,7 +97,6 @@ function init3DVisualizer() {
     scene.add(treeGroup);
     scene.add(vortexGroup);
 
-    // Mouse Controls (3D Orbit & Pan)
     canvas.addEventListener('mousedown', (e) => {
         isDragging = true;
         previousMousePosition = { x: e.clientX, y: e.clientY };
@@ -177,7 +167,6 @@ function setVisualizerMode(mode) {
     if (vortexGroup) vortexGroup.visible = (mode === 'vortex');
 }
 
-// Minimalist Monochrome Canvas Text Sprite
 function makeTextSprite(message, isPrimary = true) {
     const fontface = 'Fira Code, monospace';
     const fontsize = 26;
@@ -191,7 +180,6 @@ function makeTextSprite(message, isPrimary = true) {
     ctx.textBaseline = 'middle';
 
     if (isPrimary) {
-        // Crisp White Pill with Black Text
         ctx.fillStyle = '#ffffff';
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 1;
@@ -203,7 +191,6 @@ function makeTextSprite(message, isPrimary = true) {
         ctx.fillStyle = '#000000';
         ctx.fillText(message, 128, 35);
     } else {
-        // Pure Black Pill with White Text and Silver Border
         ctx.fillStyle = '#0a0a0a';
         ctx.strokeStyle = '#444444';
         ctx.lineWidth = 2;
@@ -224,7 +211,6 @@ function makeTextSprite(message, isPrimary = true) {
     return sprite;
 }
 
-// Build 3D Monochromatic Balanced Binary Tree (std::set)
 function build3DTree(uniqueKeywords) {
     if (!treeGroup || typeof THREE === 'undefined') return;
 
@@ -254,7 +240,6 @@ function build3DTree(uniqueKeywords) {
         const nodeGroup = new THREE.Group();
         nodeGroup.position.set(x, y, z);
 
-        // Spheres in pure monochrome
         const sphereGeo = new THREE.SphereGeometry(1.3, 28, 28);
         const sphereMat = new THREE.MeshStandardMaterial({
             color: isPrimary ? 0xffffff : 0x1a1a1a,
@@ -266,7 +251,6 @@ function build3DTree(uniqueKeywords) {
         const sphere = new THREE.Mesh(sphereGeo, sphereMat);
         nodeGroup.add(sphere);
 
-        // Minimalist Wireframe Halo Ring
         const ringGeo = new THREE.RingGeometry(1.6, 1.8, 28);
         const ringMat = new THREE.MeshBasicMaterial({
             color: isPrimary ? 0xffffff : 0x555555,
@@ -278,7 +262,6 @@ function build3DTree(uniqueKeywords) {
         ring.rotation.x = Math.PI / 2;
         nodeGroup.add(ring);
 
-        // Text Sprite
         const textSprite = makeTextSprite(keyword, isPrimary);
         textSprite.position.set(0, 2.6, 0);
         nodeGroup.add(textSprite);
@@ -321,7 +304,6 @@ function build3DTree(uniqueKeywords) {
     camera.position.set(0, 2, Math.max(45, n * 1.5));
 }
 
-// 3D Monochromatic Token Vortex
 function build3DTokenVortex(rawTokens) {
     if (!vortexGroup || typeof THREE === 'undefined') return;
 
@@ -359,9 +341,6 @@ function build3DTokenVortex(rawTokens) {
     vortexGroup.visible = (visualizerMode === 'vortex');
 }
 
-// =============================================================================
-// CLIENT APPLICATION & API BRIDGE
-// =============================================================================
 function switchTab(tabId) {
     document.querySelectorAll('.mono-tab-item').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.mono-tab-pane').forEach(pane => pane.classList.remove('active'));
@@ -458,7 +437,6 @@ function renderAnalysis(data) {
     }
 }
 
-// Strict Monochromatic Badges
 function getCategoryBadge(category) {
     const cat = category.toLowerCase();
     if (cat.includes('control')) return '<span class="mono-badge badge-solid-white">Control Flow</span>';

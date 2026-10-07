@@ -16,9 +16,7 @@
 
 namespace fs = std::filesystem;
 
-// Built-in demonstration C++ program snippet
-const std::string DEFAULT_DEMO_CODE = R"CPP(// Sample C++ Program for Compiler Syntax Token Extraction
-#include <iostream>
+const std::string DEFAULT_DEMO_CODE = R"CPP(#include <iostream>
 #include <vector>
 #include <string>
 
@@ -58,7 +56,6 @@ namespace ParserDemo {
 int main(int argc, char* argv[]) {
     using namespace ParserDemo;
     
-    // Allocate dynamic container
     DynamicContainer<int>* containerPtr = new DynamicContainer<int>();
     
     for (int i = 0; i < 50; ++i) {
@@ -194,14 +191,12 @@ void handleExport(SessionState& state) {
         return;
     }
 
-    // Ensure benchmark results are generated
     if (state.benchmarkResults.empty()) {
         std::cout << "[*] Generating benchmark metrics for the export...\n";
         ComplexityEvaluator evaluator;
         state.benchmarkResults = evaluator.runBenchmark({500, 1500, 5000, 15000});
     }
 
-    // Create export folder if it doesn't exist
     fs::create_directories("export");
 
     std::string jsonPath = "export/analysis_result.json";
@@ -232,7 +227,6 @@ void handleExport(SessionState& state) {
 int main(int argc, char* argv[]) {
     SessionState session;
 
-    // Check for CLI arguments
     if (argc > 1) {
         std::string arg1 = argv[1];
         if (arg1 == "--help" || arg1 == "-h") {
@@ -280,7 +274,6 @@ int main(int argc, char* argv[]) {
     }
 
     printBanner();
-    // Default analyze demo snippet initially
     runAnalysis(session);
 
     std::string inputLine;

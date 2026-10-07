@@ -1,4 +1,3 @@
-// Sample 1: Simple Math & Control Flow Program
 #include <iostream>
 
 bool isPrime(int n) {

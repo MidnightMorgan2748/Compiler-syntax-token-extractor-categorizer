@@ -1,4 +1,3 @@
-// Sample 2: Advanced C++ Program with OOP, Templates, Exceptions, Memory
 #include <iostream>
 #include <vector>
 #include <string>

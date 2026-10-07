@@ -24,17 +24,15 @@ std::vector<std::string> ComplexityEvaluator::generateSyntheticTokenStream(size_
     std::vector<std::string> stream;
     stream.reserve(totalTokens);
 
-    std::mt19937 rng(42); // deterministic seed for reproducibility
+    std::mt19937 rng(42);
     std::uniform_real_distribution<double> dist01(0.0, 1.0);
     std::uniform_int_distribution<size_t> kwDist(0, baseKeywords.size() - 1);
     size_t customTokenId = 0;
 
     for (size_t i = 0; i < totalTokens; ++i) {
         if (dist01(rng) < duplicateRatio && !baseKeywords.empty()) {
-            // Pick an existing keyword (causes duplicate rejection in std::set)
             stream.push_back(baseKeywords[kwDist(rng)]);
         } else {
-            // Generate distinct custom identifier
             stream.push_back("token_id_" + std::to_string(customTokenId++));
         }
     }
@@ -48,9 +46,8 @@ std::vector<BenchmarkRow> ComplexityEvaluator::runBenchmark(const std::vector<si
     double baselineTheoreticalFactor = -1.0;
 
     for (size_t N : sampleSizes) {
-        std::vector<std::string> tokens = generateSyntheticTokenStream(N, 0.70); // 70% duplicates
+        std::vector<std::string> tokens = generateSyntheticTokenStream(N, 0.70);
 
-        // --- 1. Benchmark std::vector with Linear Search (O(N * U)) ---
         double vectorTimeMs = 0.0;
         {
             auto start = std::chrono::high_resolution_clock::now();
@@ -64,21 +61,19 @@ std::vector<BenchmarkRow> ComplexityEvaluator::runBenchmark(const std::vector<si
             vectorTimeMs = std::chrono::duration<double, std::milli>(end - start).count();
         }
 
-        // --- 2. Benchmark std::set (Balanced Red-Black Tree, O(N log U)) ---
         double setTimeMs = 0.0;
         size_t uniqueCount = 0;
         {
             auto start = std::chrono::high_resolution_clock::now();
             std::set<std::string> uniqueSet;
             for (const auto& tok : tokens) {
-                uniqueSet.insert(tok); // Duplicate rejected in O(log U)
+                uniqueSet.insert(tok);
             }
             auto end = std::chrono::high_resolution_clock::now();
             setTimeMs = std::chrono::duration<double, std::milli>(end - start).count();
             uniqueCount = uniqueSet.size();
         }
 
-        // --- 3. Benchmark std::unordered_set (Hash Table, O(N) average) ---
         double hashTimeMs = 0.0;
         {
             auto start = std::chrono::high_resolution_clock::now();
@@ -90,7 +85,6 @@ std::vector<BenchmarkRow> ComplexityEvaluator::runBenchmark(const std::vector<si
             hashTimeMs = std::chrono::duration<double, std::milli>(end - start).count();
         }
 
-        // Compute Red-Black Tree metrics
         size_t estimatedHeight = (uniqueCount > 0)
             ? static_cast<size_t>(2.0 * std::ceil(std::log2(static_cast<double>(uniqueCount + 1))))
             : 0;

@@ -30,14 +30,12 @@ void testTokenizer() {
 void testLexicographicalOrderingAndDuplicates() {
     std::cout << "[RUNNING TEST] testLexicographicalOrderingAndDuplicates...";
     Tokenizer tokenizer;
-    // Input containing duplicates and out-of-order keywords
     std::string sample = "while (true) { for (int i = 0; i < 10; ++i) { if (i == 5) break; else continue; } return; }";
     std::vector<std::string> tokens = tokenizer.tokenizeToVector(sample);
 
     KeywordExtractor extractor;
     ExtractionResult result = extractor.extract(tokens);
 
-    // 1. Verify that keywords are present
     assert(result.uniqueKeywords.find("while") != result.uniqueKeywords.end());
     assert(result.uniqueKeywords.find("for") != result.uniqueKeywords.end());
     assert(result.uniqueKeywords.find("int") != result.uniqueKeywords.end());
@@ -47,7 +45,6 @@ void testLexicographicalOrderingAndDuplicates() {
     assert(result.uniqueKeywords.find("continue") != result.uniqueKeywords.end());
     assert(result.uniqueKeywords.find("return") != result.uniqueKeywords.end());
 
-    // 2. Verify strict lexicographical sorting in std::set
     std::string prev = "";
     for (const auto& kw : result.uniqueKeywords) {
         if (!prev.empty()) {
@@ -56,7 +53,6 @@ void testLexicographicalOrderingAndDuplicates() {
         prev = kw;
     }
 
-    // 3. Verify duplicate detection count logic
     assert(result.totalKeywordOccurrences > result.uniqueKeywordCount || result.duplicateRejectionsCount >= 0);
     assert(result.totalKeywordOccurrences == result.uniqueKeywordCount + result.duplicateRejectionsCount);
 

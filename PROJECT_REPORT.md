@@ -201,13 +201,6 @@ As requested, the complete source code for each component of the project is past
 #include <string_view>
 #include <iostream>
 
-/**
- * @file Token.hpp
- * @brief Token types, keyword categories, and Token structure definitions.
- * 
- * Part of Group 5: Compiler Syntax Token Unique Extractor & Categorizer
- */
-
 enum class TokenType {
     KEYWORD,
     IDENTIFIER,
@@ -224,14 +217,14 @@ enum class TokenType {
 };
 
 enum class KeywordCategory {
-    CONTROL_FLOW,          // if, else, switch, case, default, while, do, for, break, continue, return, goto
-    DATA_TYPE,             // int, char, float, double, void, bool, short, long, signed, unsigned, wchar_t, auto
-    MODIFIER_STORAGE,      // const, volatile, static, extern, register, mutable, constexpr, inline, consteval, constinit
-    CLASS_STRUCT_ACCESS,   // class, struct, union, enum, public, private, protected, friend, virtual, override, final
-    MEMORY_EXCEPTION,      // new, delete, this, try, catch, throw, noexcept, nullptr
-    TEMPLATE_CAST_SPEC,    // template, typename, namespace, using, static_cast, dynamic_cast, const_cast, reinterpret_cast, typeid, sizeof, decltype
-    CONCURRENCY,           // thread_local, co_await, co_return, co_yield
-    OTHER_KEYWORD,         // asm, explicit, export, etc.
+    CONTROL_FLOW,
+    DATA_TYPE,
+    MODIFIER_STORAGE,
+    CLASS_STRUCT_ACCESS,
+    MEMORY_EXCEPTION,
+    TEMPLATE_CAST_SPEC,
+    CONCURRENCY,
+    OTHER_KEYWORD,
     NOT_A_KEYWORD
 };
 
@@ -250,7 +243,6 @@ struct Token {
         : lexeme(std::move(lex)), type(t), keywordCategory(kwCat), line(ln), column(col) {}
 };
 
-// String conversion helper declarations
 std::string tokenTypeToString(TokenType type);
 std::string keywordCategoryToString(KeywordCategory category);
 ```
@@ -310,14 +302,6 @@ std::string keywordCategoryToString(KeywordCategory category) {
 #include <string>
 #include <vector>
 #include <memory>
-
-/**
- * @file Tokenizer.hpp
- * @brief Lexical analyzer that parses source code into a dynamic std::vector<std::string>
- *        and enriched std::vector<Token>.
- * 
- * Part of Group 5: Compiler Syntax Token Unique Extractor & Categorizer
- */
 
 class Tokenizer {
 public:
@@ -400,7 +384,6 @@ std::vector<Token> Tokenizer::tokenizeDetailed(const std::string& sourceCode,
     while (i < len) {
         char c = sourceCode[i];
 
-        // 1. Handle Whitespace & Newlines
         if (c == '\r') {
             i++;
             if (i < len && sourceCode[i] == '\n') {
@@ -419,7 +402,6 @@ std::vector<Token> Tokenizer::tokenizeDetailed(const std::string& sourceCode,
             continue;
         }
 
-        // 2. Preprocessor Directives (#...)
         if (c == '#' && (getCol(i) == 1 || [&]() {
             for (size_t k = lineStartPos; k < i; ++k) {
                 if (!std::isspace(static_cast<unsigned char>(sourceCode[k]))) return false;
@@ -450,7 +432,6 @@ std::vector<Token> Tokenizer::tokenizeDetailed(const std::string& sourceCode,
             continue;
         }
 
-        // 3. Comments (// or /* ... */)
         if (c == '/' && i + 1 < len) {
             if (sourceCode[i + 1] == '/') {
                 size_t startCol = getCol(i);
@@ -488,7 +469,6 @@ std::vector<Token> Tokenizer::tokenizeDetailed(const std::string& sourceCode,
             }
         }
 
-        // 4. String Literals ("...")
         if (c == '"') {
             size_t startCol = getCol(i);
             size_t startIdx = i++;
@@ -511,7 +491,6 @@ std::vector<Token> Tokenizer::tokenizeDetailed(const std::string& sourceCode,
             continue;
         }
 
-        // 5. Character Literals ('.')
         if (c == '\'') {
             size_t startCol = getCol(i);
             size_t startIdx = i++;
@@ -530,7 +509,6 @@ std::vector<Token> Tokenizer::tokenizeDetailed(const std::string& sourceCode,
             continue;
         }
 
-        // 6. Identifiers and Keywords
         if (std::isalpha(static_cast<unsigned char>(c)) || c == '_') {
             size_t startCol = getCol(i);
             size_t startIdx = i++;
@@ -546,7 +524,6 @@ std::vector<Token> Tokenizer::tokenizeDetailed(const std::string& sourceCode,
             continue;
         }
 
-        // 7. Numbers (Integers & Floating-point)
         if (std::isdigit(static_cast<unsigned char>(c)) || (c == '.' && i + 1 < len && std::isdigit(static_cast<unsigned char>(sourceCode[i + 1])))) {
             size_t startCol = getCol(i);
             size_t startIdx = i;
@@ -593,7 +570,6 @@ std::vector<Token> Tokenizer::tokenizeDetailed(const std::string& sourceCode,
             continue;
         }
 
-        // 8. Multi-character Operators and Punctuation
         size_t startCol = getCol(i);
         if (i + 2 < len) {
             std::string op3 = sourceCode.substr(i, 3);
@@ -616,21 +592,18 @@ std::vector<Token> Tokenizer::tokenizeDetailed(const std::string& sourceCode,
             }
         }
 
-        // 9. Single-character Punctuation
         if (isPunctuationChar(c)) {
             tokens.emplace_back(std::string(1, c), TokenType::PUNCTUATION, currentLine, startCol);
             i++;
             continue;
         }
 
-        // 10. Single-character Operator
         if (isOperatorChar(c)) {
             tokens.emplace_back(std::string(1, c), TokenType::OPERATOR, currentLine, startCol);
             i++;
             continue;
         }
 
-        // 11. Unknown / Fallback
         tokens.emplace_back(std::string(1, c), TokenType::UNKNOWN, currentLine, startCol);
         i++;
     }
@@ -671,33 +644,25 @@ std::vector<Token> Tokenizer::tokenizeFileDetailed(const std::string& filePath,
 #include <unordered_map>
 #include <iostream>
 
-/**
- * @file KeywordExtractor.hpp
- * @brief Isolates unique syntax keywords in lexicographically sorted order using std::set<std::string>
- *        and calculates comprehensive original frequency metrics.
- * 
- * Part of Group 5: Compiler Syntax Token Unique Extractor & Categorizer
- */
-
 struct KeywordMetric {
     std::string keyword;
-    size_t originalFrequency;   // Occurrences in original token stream
-    double relativeFrequency;   // Percentage of total keywords
-    double streamPercentage;    // Percentage of total source tokens
+    size_t originalFrequency;
+    double relativeFrequency;
+    double streamPercentage;
     KeywordCategory category;
 };
 
 struct ExtractionResult {
-    std::set<std::string> uniqueKeywords;                 // Lexicographically sorted unique keywords (std::set)
-    std::map<std::string, size_t> keywordFrequencies;     // Frequency of each keyword in the source stream
-    std::vector<KeywordMetric> detailedMetrics;           // Sorted enriched metrics
-    size_t totalTokensIngested;                           // Total tokens in std::vector<std::string>
-    size_t totalKeywordOccurrences;                       // Total keyword appearances in vector
-    size_t uniqueKeywordCount;                            // Number of distinct keywords
-    size_t duplicateRejectionsCount;                      // Number of duplicate insertions rejected by std::set
-    double keywordDensityPercentage;                      // (totalKeywords / totalTokens) * 100
-    double uniquenessRatio;                               // (uniqueKeywords / totalKeywords) * 100
-    double duplicateSuppressionRatio;                     // (duplicateRejections / totalKeywords) * 100
+    std::set<std::string> uniqueKeywords;
+    std::map<std::string, size_t> keywordFrequencies;
+    std::vector<KeywordMetric> detailedMetrics;
+    size_t totalTokensIngested;
+    size_t totalKeywordOccurrences;
+    size_t uniqueKeywordCount;
+    size_t duplicateRejectionsCount;
+    double keywordDensityPercentage;
+    double uniquenessRatio;
+    double duplicateSuppressionRatio;
 };
 
 class KeywordExtractor {
@@ -724,7 +689,6 @@ KeywordExtractor::KeywordExtractor() {}
 
 const std::unordered_map<std::string, KeywordCategory>& KeywordExtractor::getKeywordRegistry() {
     static const std::unordered_map<std::string, KeywordCategory> registry = {
-        // Control Flow
         {"if", KeywordCategory::CONTROL_FLOW},
         {"else", KeywordCategory::CONTROL_FLOW},
         {"switch", KeywordCategory::CONTROL_FLOW},
@@ -738,7 +702,6 @@ const std::unordered_map<std::string, KeywordCategory>& KeywordExtractor::getKey
         {"return", KeywordCategory::CONTROL_FLOW},
         {"goto", KeywordCategory::CONTROL_FLOW},
 
-        // Data Types / Primitives
         {"int", KeywordCategory::DATA_TYPE},
         {"char", KeywordCategory::DATA_TYPE},
         {"float", KeywordCategory::DATA_TYPE},
@@ -755,7 +718,6 @@ const std::unordered_map<std::string, KeywordCategory>& KeywordExtractor::getKey
         {"char8_t", KeywordCategory::DATA_TYPE},
         {"auto", KeywordCategory::DATA_TYPE},
 
-        // Storage Classes & Modifiers
         {"const", KeywordCategory::MODIFIER_STORAGE},
         {"volatile", KeywordCategory::MODIFIER_STORAGE},
         {"static", KeywordCategory::MODIFIER_STORAGE},
@@ -767,7 +729,6 @@ const std::unordered_map<std::string, KeywordCategory>& KeywordExtractor::getKey
         {"constinit", KeywordCategory::MODIFIER_STORAGE},
         {"inline", KeywordCategory::MODIFIER_STORAGE},
 
-        // OOP, Classes, Structs & Access
         {"class", KeywordCategory::CLASS_STRUCT_ACCESS},
         {"struct", KeywordCategory::CLASS_STRUCT_ACCESS},
         {"union", KeywordCategory::CLASS_STRUCT_ACCESS},
@@ -780,7 +741,6 @@ const std::unordered_map<std::string, KeywordCategory>& KeywordExtractor::getKey
         {"override", KeywordCategory::CLASS_STRUCT_ACCESS},
         {"final", KeywordCategory::CLASS_STRUCT_ACCESS},
 
-        // Memory & Exception Handling
         {"new", KeywordCategory::MEMORY_EXCEPTION},
         {"delete", KeywordCategory::MEMORY_EXCEPTION},
         {"this", KeywordCategory::MEMORY_EXCEPTION},
@@ -790,7 +750,6 @@ const std::unordered_map<std::string, KeywordCategory>& KeywordExtractor::getKey
         {"noexcept", KeywordCategory::MEMORY_EXCEPTION},
         {"nullptr", KeywordCategory::MEMORY_EXCEPTION},
 
-        // Templates, Casts, Types & Namespaces
         {"template", KeywordCategory::TEMPLATE_CAST_SPEC},
         {"typename", KeywordCategory::TEMPLATE_CAST_SPEC},
         {"namespace", KeywordCategory::TEMPLATE_CAST_SPEC},
@@ -808,13 +767,11 @@ const std::unordered_map<std::string, KeywordCategory>& KeywordExtractor::getKey
         {"concept", KeywordCategory::TEMPLATE_CAST_SPEC},
         {"requires", KeywordCategory::TEMPLATE_CAST_SPEC},
 
-        // Concurrency & Coroutines
         {"thread_local", KeywordCategory::CONCURRENCY},
         {"co_await", KeywordCategory::CONCURRENCY},
         {"co_return", KeywordCategory::CONCURRENCY},
         {"co_yield", KeywordCategory::CONCURRENCY},
 
-        // Other Standard Keywords
         {"asm", KeywordCategory::OTHER_KEYWORD},
         {"static_assert", KeywordCategory::OTHER_KEYWORD},
         {"alignas", KeywordCategory::OTHER_KEYWORD},
@@ -843,15 +800,11 @@ ExtractionResult KeywordExtractor::extract(const std::vector<std::string>& token
     result.totalKeywordOccurrences = 0;
     result.duplicateRejectionsCount = 0;
 
-    // Ingest and isolate unique keywords using std::set<std::string>
     for (const auto& token : tokens) {
         if (isKeyword(token)) {
             result.totalKeywordOccurrences++;
             result.keywordFrequencies[token]++;
 
-            // Demonstrating std::set unique insertion properties:
-            // insert() returns std::pair<iterator, bool>
-            // .second is true if new element was inserted, false if duplicate rejected
             auto [iter, inserted] = result.uniqueKeywords.insert(token);
             if (!inserted) {
                 result.duplicateRejectionsCount++;
@@ -861,7 +814,6 @@ ExtractionResult KeywordExtractor::extract(const std::vector<std::string>& token
 
     result.uniqueKeywordCount = result.uniqueKeywords.size();
 
-    // Calculate statistical metrics
     if (result.totalTokensIngested > 0) {
         result.keywordDensityPercentage = 
             (static_cast<double>(result.totalKeywordOccurrences) / result.totalTokensIngested) * 100.0;
@@ -879,7 +831,6 @@ ExtractionResult KeywordExtractor::extract(const std::vector<std::string>& token
         result.duplicateSuppressionRatio = 0.0;
     }
 
-    // Populate detailed metrics in lexicographical order (from std::set traversal)
     for (const auto& kw : result.uniqueKeywords) {
         size_t freq = result.keywordFrequencies[kw];
         double relFreq = (result.totalKeywordOccurrences > 0)
@@ -963,13 +914,6 @@ void KeywordExtractor::printFormattedReport(const ExtractionResult& result, std:
 #include <map>
 #include <set>
 #include <iostream>
-
-/**
- * @file SyntaxCategorizer.hpp
- * @brief Classifies and categorizes all ingested tokens into syntax groups and subgroups.
- * 
- * Part of Group 5: Compiler Syntax Token Unique Extractor & Categorizer
- */
 
 struct CategoryStat {
     std::string categoryName;
@@ -1166,23 +1110,15 @@ void SyntaxCategorizer::printFormattedReport(const CategorizationReport& report,
 #include <vector>
 #include <iostream>
 
-/**
- * @file ComplexityEvaluator.hpp
- * @brief Evaluates std::set unique insertion properties and logarithmic bounds O(log N)
- *        with empirical benchmarking and theoretical mathematical validation.
- * 
- * Part of Group 5: Compiler Syntax Token Unique Extractor & Categorizer
- */
-
 struct BenchmarkRow {
     size_t tokenCount;
     size_t uniqueCount;
-    double vectorLinearTimeMs;    // std::vector + linear search O(N^2)
-    double setTimeMs;             // std::set Red-Black Tree O(N log U)
-    double unorderedSetTimeMs;    // std::unordered_set Hash Table O(N)
-    double setTheoreticalScaling; // Theoretical ratio compared to baseline
-    double setEmpiricalScaling;   // Empirical ratio compared to baseline
-    size_t estimatedTreeHeight;   // Max theoretical Red-Black tree height: <= 2 * log2(U + 1)
+    double vectorLinearTimeMs;
+    double setTimeMs;
+    double unorderedSetTimeMs;
+    double setTheoreticalScaling;
+    double setEmpiricalScaling;
+    size_t estimatedTreeHeight;
 };
 
 class ComplexityEvaluator {
@@ -1226,7 +1162,7 @@ std::vector<std::string> ComplexityEvaluator::generateSyntheticTokenStream(size_
     std::vector<std::string> stream;
     stream.reserve(totalTokens);
 
-    std::mt19937 rng(42); // deterministic seed for reproducibility
+    std::mt19937 rng(42);
     std::uniform_real_distribution<double> dist01(0.0, 1.0);
     std::uniform_int_distribution<size_t> kwDist(0, baseKeywords.size() - 1);
     size_t customTokenId = 0;
@@ -1248,9 +1184,8 @@ std::vector<BenchmarkRow> ComplexityEvaluator::runBenchmark(const std::vector<si
     double baselineTheoreticalFactor = -1.0;
 
     for (size_t N : sampleSizes) {
-        std::vector<std::string> tokens = generateSyntheticTokenStream(N, 0.70); // 70% duplicates
+        std::vector<std::string> tokens = generateSyntheticTokenStream(N, 0.70);
 
-        // --- 1. Benchmark std::vector with Linear Search (O(N * U)) ---
         double vectorTimeMs = 0.0;
         {
             auto start = std::chrono::high_resolution_clock::now();
@@ -1264,21 +1199,19 @@ std::vector<BenchmarkRow> ComplexityEvaluator::runBenchmark(const std::vector<si
             vectorTimeMs = std::chrono::duration<double, std::milli>(end - start).count();
         }
 
-        // --- 2. Benchmark std::set (Balanced Red-Black Tree, O(N log U)) ---
         double setTimeMs = 0.0;
         size_t uniqueCount = 0;
         {
             auto start = std::chrono::high_resolution_clock::now();
             std::set<std::string> uniqueSet;
             for (const auto& tok : tokens) {
-                uniqueSet.insert(tok); // Duplicate rejected in O(log U)
+                uniqueSet.insert(tok);
             }
             auto end = std::chrono::high_resolution_clock::now();
             setTimeMs = std::chrono::duration<double, std::milli>(end - start).count();
             uniqueCount = uniqueSet.size();
         }
 
-        // --- 3. Benchmark std::unordered_set (Hash Table, O(N) average) ---
         double hashTimeMs = 0.0;
         {
             auto start = std::chrono::high_resolution_clock::now();
@@ -1290,7 +1223,6 @@ std::vector<BenchmarkRow> ComplexityEvaluator::runBenchmark(const std::vector<si
             hashTimeMs = std::chrono::duration<double, std::milli>(end - start).count();
         }
 
-        // Compute Red-Black Tree metrics
         size_t estimatedHeight = (uniqueCount > 0)
             ? static_cast<size_t>(2.0 * std::ceil(std::log2(static_cast<double>(uniqueCount + 1))))
             : 0;
@@ -1422,14 +1354,6 @@ void ComplexityEvaluator::printTheoreticalAnalysis(std::ostream& os) {
 #include <string>
 #include <vector>
 
-/**
- * @file JsonExporter.hpp
- * @brief Exports tokenization, keyword extraction, and benchmark results to standard JSON.
- *        Serves as the data interchange bridge for future Frontend GUI / Web applications.
- * 
- * Part of Group 5: Compiler Syntax Token Unique Extractor & Categorizer
- */
-
 class JsonExporter {
 public:
     JsonExporter();
@@ -1501,7 +1425,6 @@ bool JsonExporter::exportAnalysis(const std::string& outputPath,
     out << "  \"group\": \"Group 5\",\n";
     out << "  \"sourceName\": \"" << escapeJsonString(sourceName) << "\",\n";
     
-    // 1. Summary Metrics
     out << "  \"metrics\": {\n";
     out << "    \"totalTokensIngested\": " << extractionResult.totalTokensIngested << ",\n";
     out << "    \"totalKeywordOccurrences\": " << extractionResult.totalKeywordOccurrences << ",\n";
@@ -1512,7 +1435,6 @@ bool JsonExporter::exportAnalysis(const std::string& outputPath,
     out << "    \"duplicateSuppressionRatio\": " << extractionResult.duplicateSuppressionRatio << "\n";
     out << "  },\n";
 
-    // 2. Lexicographically Sorted Unique Keywords (std::set)
     out << "  \"uniqueKeywordsLexicographical\": [\n";
     size_t kwIdx = 0;
     for (const auto& kw : extractionResult.uniqueKeywords) {
@@ -1520,7 +1442,6 @@ bool JsonExporter::exportAnalysis(const std::string& outputPath,
     }
     out << "  ],\n";
 
-    // 3. Detailed Keyword Frequency Table
     out << "  \"keywordFrequencies\": [\n";
     for (size_t i = 0; i < extractionResult.detailedMetrics.size(); ++i) {
         const auto& m = extractionResult.detailedMetrics[i];
@@ -1534,7 +1455,6 @@ bool JsonExporter::exportAnalysis(const std::string& outputPath,
     }
     out << "  ],\n";
 
-    // 4. Categorization Report
     out << "  \"syntaxCategorization\": {\n";
     out << "    \"tokenTypes\": [\n";
     size_t ttIdx = 0;
@@ -1565,14 +1485,12 @@ bool JsonExporter::exportAnalysis(const std::string& outputPath,
     out << "\n    ]\n";
     out << "  },\n";
 
-    // 5. Ingested Raw Tokens Sequence (std::vector<std::string>)
     out << "  \"rawTokens\": [\n";
     for (size_t i = 0; i < rawTokens.size(); ++i) {
         out << "    \"" << escapeJsonString(rawTokens[i]) << "\"" << (i + 1 < rawTokens.size() ? "," : "") << "\n";
     }
     out << "  ],\n";
 
-    // 6. Empirical Complexity Benchmarks
     out << "  \"complexityBenchmarks\": [\n";
     for (size_t i = 0; i < benchmarkRows.size(); ++i) {
         const auto& b = benchmarkRows[i];
@@ -1626,31 +1544,41 @@ bool JsonExporter::exportHtmlDashboard(const std::string& htmlOutputPath,
             --bg-secondary: #1e293b;
             --bg-card: #1e293b;
             --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.2);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --border-color: #334155;
             --success: #10b981;
+            --warning: #f59e0b;
+            --purple: #a855f7;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
         body { background: var(--bg-primary); color: var(--text-main); min-height: 100vh; padding: 2rem; }
         .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 1.5rem; margin-bottom: 2rem; }
         .header h1 { font-size: 1.8rem; color: var(--accent); }
+        .header .badge { background: #0369a1; padding: 0.35rem 0.8rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 600; }
         .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.2rem; margin-bottom: 2rem; }
-        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.2rem; }
-        .card .title { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.4rem; }
+        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.2rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); }
+        .card .title { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4rem; }
         .card .val { font-size: 1.9rem; font-weight: bold; color: var(--accent); }
         .tabs { display: flex; gap: 0.5rem; border-bottom: 1px solid var(--border-color); margin-bottom: 1.5rem; }
-        .tab-btn { background: none; border: none; color: var(--text-muted); padding: 0.75rem 1.25rem; font-size: 1rem; cursor: pointer; border-bottom: 3px solid transparent; }
+        .tab-btn { background: none; border: none; color: var(--text-muted); padding: 0.75rem 1.25rem; font-size: 1rem; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; }
         .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
         th, td { padding: 0.8rem 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
-        th { background: #1e293b; color: var(--accent); font-size: 0.85rem; }
-        .token-cloud { display: flex; flex-wrap: wrap; gap: 0.5rem; max-height: 400px; overflow-y: auto; padding: 1rem; background: #0b1120; border-radius: 8px; }
-        .token-item { padding: 0.3rem 0.6rem; background: #1e293b; border-radius: 4px; font-family: monospace; font-size: 0.85rem; }
+        th { background: #1e293b; color: var(--accent); font-size: 0.85rem; text-transform: uppercase; }
+        tr:hover { background: rgba(56, 189, 248, 0.05); }
+        .pill { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 6px; font-size: 0.8rem; font-weight: 500; }
+        .pill-flow { background: #7c2d12; color: #fdba74; }
+        .pill-type { background: #1e3a8a; color: #93c5fd; }
+        .pill-oop  { background: #581c87; color: #d8b4fe; }
+        .pill-mem  { background: #14532d; color: #86efac; }
+        .token-cloud { display: flex; flex-wrap: wrap; gap: 0.5rem; max-height: 400px; overflow-y: auto; padding: 1rem; background: #0b1120; border-radius: 8px; border: 1px solid var(--border-color); }
+        .token-item { padding: 0.3rem 0.6rem; background: #1e293b; border-radius: 4px; font-family: monospace; font-size: 0.85rem; color: #e2e8f0; }
         .token-item.is-kw { background: #0284c7; color: #fff; font-weight: bold; }
-        .search-box { width: 100%; max-width: 350px; padding: 0.6rem 1rem; background: #0b1120; border: 1px solid var(--border-color); border-radius: 6px; color: #fff; }
+        .search-box { width: 100%; max-width: 350px; padding: 0.6rem 1rem; background: #0b1120; border: 1px solid var(--border-color); border-radius: 6px; color: #fff; margin-bottom: 1rem; }
     </style>
 </head>
 <body>
@@ -1659,9 +1587,10 @@ bool JsonExporter::exportHtmlDashboard(const std::string& htmlOutputPath,
             <h1>Compiler Syntax Token Unique Extractor & Categorizer</h1>
             <p style="color: var(--text-muted); margin-top: 0.25rem;">Group 5 &bull; Core STL: std::set, std::vector, std::string</p>
         </div>
+        <div><span class="badge">C++ Term 1 Project</span></div>
     </div>
 
-    <div class="metrics-grid">
+    <div class="metrics-grid" id="metricsGrid">
         <div class="card"><div class="title">Total Ingested Tokens</div><div class="val" id="metricTotalTokens">--</div></div>
         <div class="card"><div class="title">Total Keywords</div><div class="val" id="metricTotalKw">--</div></div>
         <div class="card"><div class="title">Unique Keywords (std::set)</div><div class="val" id="metricUniqueKw">--</div></div>
@@ -1685,9 +1614,18 @@ bool JsonExporter::exportHtmlDashboard(const std::string& htmlOutputPath,
             </div>
             <table>
                 <thead>
-                    <tr><th>#</th><th>Keyword</th><th>Category</th><th>Frequency</th><th>Keyword Share</th><th>Stream Share</th></tr>
+                    <tr>
+                        <th>#</th>
+                        <th>Keyword</th>
+                        <th>Category</th>
+                        <th>Frequency</th>
+                        <th>Keyword Share</th>
+                        <th>Stream Share</th>
+                    </tr>
                 </thead>
-                <tbody id="keywordTableBody"></tbody>
+                <tbody id="keywordTableBody">
+                    <tr><td colspan="6" style="text-align:center;">Loading analysis data...</td></tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -1696,25 +1634,51 @@ bool JsonExporter::exportHtmlDashboard(const std::string& htmlOutputPath,
         <div class="card" style="margin-bottom: 1.5rem;">
             <h3>Overall Syntax Categorization Breakdown</h3>
             <table>
-                <thead><tr><th>Category</th><th>Total Tokens</th><th>Unique Items</th><th>Stream Share</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Total Tokens</th>
+                        <th>Unique Items</th>
+                        <th>Stream Share</th>
+                    </tr>
+                </thead>
                 <tbody id="catTypeTableBody"></tbody>
             </table>
         </div>
         <div class="card">
-            <h3>Keyword Sub-Taxonomy Breakdown</h3>
+            <h3>Keyword Sub-Taxonomy (std::set segregation)</h3>
             <table>
-                <thead><tr><th>Subgroup</th><th>Occurrences</th><th>Unique Count</th><th>Keyword Share</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>Subgroup</th>
+                        <th>Occurrences</th>
+                        <th>Unique Count</th>
+                        <th>Keyword Share</th>
+                    </tr>
+                </thead>
                 <tbody id="kwSubgroupTableBody"></tbody>
             </table>
         </div>
     </div>
 
     <div id="tab-complexity" class="tab-content">
-        <div class="card">
-            <h3>Logarithmic Bounds & Comparative Benchmarks</h3>
+        <div class="card" style="margin-bottom: 1.5rem;">
+            <h3>Theoretical & Empirical Validation of std::set Logarithmic Bounds</h3>
+            <p style="color: var(--text-muted); margin: 0.5rem 0 1rem 0;">
+                std::set uses a Self-Balancing Red-Black Binary Search Tree. Every insertion verifies uniqueness and rebalances in O(log U) time.
+                In contrast, naive std::vector with linear search exhibits O(N &times; U) quadratic decay.
+            </p>
             <table>
                 <thead>
-                    <tr><th>Tokens (N)</th><th>Unique (U)</th><th>RB Max Height &le;</th><th>std::vector O(N&sup2;)</th><th>std::set O(N log U)</th><th>std::unordered_set O(N)</th><th>Speedup vs Vector</th></tr>
+                    <tr>
+                        <th>Tokens (N)</th>
+                        <th>Unique (U)</th>
+                        <th>RB Max Height &le;</th>
+                        <th>std::vector O(N&sup2;) Time</th>
+                        <th>std::set O(N log U) Time</th>
+                        <th>std::unordered_set O(N) Time</th>
+                        <th>std::set vs Vector Speedup</th>
+                    </tr>
                 </thead>
                 <tbody id="benchmarkTableBody"></tbody>
             </table>
@@ -1724,6 +1688,7 @@ bool JsonExporter::exportHtmlDashboard(const std::string& htmlOutputPath,
     <div id="tab-tokens" class="tab-content">
         <div class="card">
             <h3>Ingested Token Stream (std::vector&lt;std::string&gt;)</h3>
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">Tokens are highlighted. Blue badges indicate recognized syntax keywords.</p>
             <div class="token-cloud" id="tokenCloud"></div>
         </div>
     </div>
@@ -1747,7 +1712,9 @@ bool JsonExporter::exportHtmlDashboard(const std::string& htmlOutputPath,
                     appData = JSON.parse(embedded.textContent);
                     renderData(appData);
                     return;
-                } catch (e) {}
+                } catch (e) {
+                    console.log('Parsing embedded JSON failed, falling back to fetch.');
+                }
             }
             fetch(')HTML" << jsonFileName << R"HTML(')
                 .then(r => r.json())
@@ -1755,7 +1722,9 @@ bool JsonExporter::exportHtmlDashboard(const std::string& htmlOutputPath,
                     appData = data;
                     renderData(data);
                 })
-                .catch(err => console.log('Waiting for JSON input...'));
+                .catch(err => {
+                    console.log('Fetching JSON failed, waiting for user input.');
+                });
         }
 
         function renderData(d) {
@@ -1771,19 +1740,37 @@ bool JsonExporter::exportHtmlDashboard(const std::string& htmlOutputPath,
             const catBody = document.getElementById('catTypeTableBody');
             catBody.innerHTML = '';
             d.syntaxCategorization.tokenTypes.forEach(t => {
-                catBody.innerHTML += `<tr><td><strong>${t.category}</strong></td><td>${t.totalCount}</td><td>${t.uniqueCount}</td><td>${t.streamPercentage}%</td></tr>`;
+                catBody.innerHTML += `<tr>
+                    <td><strong>${t.category}</strong></td>
+                    <td>${t.totalCount}</td>
+                    <td>${t.uniqueCount}</td>
+                    <td>${t.streamPercentage}%</td>
+                </tr>`;
             });
 
             const subBody = document.getElementById('kwSubgroupTableBody');
             subBody.innerHTML = '';
             d.syntaxCategorization.keywordSubgroups.forEach(s => {
-                subBody.innerHTML += `<tr><td><strong>${s.subgroup}</strong></td><td>${s.totalOccurrences}</td><td>${s.uniqueCount}</td><td>${s.keywordSharePercentage}%</td></tr>`;
+                subBody.innerHTML += `<tr>
+                    <td><strong>${s.subgroup}</strong></td>
+                    <td>${s.totalOccurrences}</td>
+                    <td>${s.uniqueCount}</td>
+                    <td>${s.keywordSharePercentage}%</td>
+                </tr>`;
             });
 
             const bBody = document.getElementById('benchmarkTableBody');
             bBody.innerHTML = '';
             d.complexityBenchmarks.forEach(b => {
-                bBody.innerHTML += `<tr><td><strong>${b.tokensN.toLocaleString()}</strong></td><td>${b.uniqueU.toLocaleString()}</td><td>${b.estimatedTreeHeight}</td><td>${b.vectorLinearTimeMs.toFixed(3)} ms</td><td style="color:var(--accent); font-weight:bold;">${b.setTimeMs.toFixed(3)} ms</td><td>${b.unorderedSetTimeMs.toFixed(3)} ms</td><td style="color:var(--success); font-weight:bold;">${b.speedupVsVector.toFixed(1)}x faster</td></tr>`;
+                bBody.innerHTML += `<tr>
+                    <td><strong>${b.tokensN.toLocaleString()}</strong></td>
+                    <td>${b.uniqueU.toLocaleString()}</td>
+                    <td>${b.estimatedTreeHeight}</td>
+                    <td>${b.vectorLinearTimeMs.toFixed(3)} ms</td>
+                    <td style="color:var(--accent); font-weight:bold;">${b.setTimeMs.toFixed(3)} ms</td>
+                    <td>${b.unorderedSetTimeMs.toFixed(3)} ms</td>
+                    <td style="color:var(--success); font-weight:bold;">${b.speedupVsVector.toFixed(1)}x faster</td>
+                </tr>`;
             });
 
             const cloud = document.getElementById('tokenCloud');
@@ -1802,7 +1789,14 @@ bool JsonExporter::exportHtmlDashboard(const std::string& htmlOutputPath,
             const tbody = document.getElementById('keywordTableBody');
             tbody.innerHTML = '';
             metrics.forEach((m, idx) => {
-                tbody.innerHTML += `<tr><td>${idx + 1}</td><td><strong style="color:var(--accent);">${m.keyword}</strong></td><td>${m.category}</td><td><strong>${m.frequency}</strong></td><td>${m.relativeFrequencyPercentage.toFixed(2)}%</td><td>${m.streamPercentage.toFixed(2)}%</td></tr>`;
+                tbody.innerHTML += `<tr>
+                    <td>${idx + 1}</td>
+                    <td><strong style="color:var(--accent);">${m.keyword}</strong></td>
+                    <td><span class="pill pill-type">${m.category}</span></td>
+                    <td><strong>${m.frequency}</strong></td>
+                    <td>${m.relativeFrequencyPercentage.toFixed(2)}%</td>
+                    <td>${m.streamPercentage.toFixed(2)}%</td>
+                </tr>`;
             });
         }
 
@@ -1854,9 +1848,7 @@ bool JsonExporter::exportHtmlDashboard(const std::string& htmlOutputPath,
 
 namespace fs = std::filesystem;
 
-// Built-in demonstration C++ program snippet
-const std::string DEFAULT_DEMO_CODE = R"CPP(// Sample C++ Program for Compiler Syntax Token Extraction
-#include <iostream>
+const std::string DEFAULT_DEMO_CODE = R"CPP(#include <iostream>
 #include <vector>
 #include <string>
 
@@ -1896,7 +1888,6 @@ namespace ParserDemo {
 int main(int argc, char* argv[]) {
     using namespace ParserDemo;
     
-    // Allocate dynamic container
     DynamicContainer<int>* containerPtr = new DynamicContainer<int>();
     
     for (int i = 0; i < 50; ++i) {
@@ -2083,6 +2074,18 @@ int main(int argc, char* argv[]) {
             session.sourceCode = Tokenizer::readFileContents(filePath);
             session.sourceName = filePath;
             runAnalysis(session);
+
+            std::string jsonPath = "export/analysis_result.json";
+            for (int a = 3; a < argc; ++a) {
+                if (std::string(argv[a]) == "--json" && a + 1 < argc) {
+                    jsonPath = argv[a + 1];
+                }
+            }
+            fs::create_directories("export");
+            JsonExporter::exportAnalysis(jsonPath, session.sourceName, session.rawTokens,
+                                         session.detailedTokens, session.extractionResult,
+                                         session.categorizationReport);
+
             KeywordExtractor::printFormattedReport(session.extractionResult);
             SyntaxCategorizer::printFormattedReport(session.categorizationReport);
             return 0;
@@ -2246,6 +2249,7 @@ void testLexicographicalOrderingAndDuplicates() {
         prev = kw;
     }
 
+    assert(result.totalKeywordOccurrences > result.uniqueKeywordCount || result.duplicateRejectionsCount >= 0);
     assert(result.totalKeywordOccurrences == result.uniqueKeywordCount + result.duplicateRejectionsCount);
 
     std::cout << " PASSED! (Unique: " << result.uniqueKeywordCount 
