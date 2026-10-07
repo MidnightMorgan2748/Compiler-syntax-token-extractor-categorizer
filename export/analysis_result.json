@@ -1,13 +1,13 @@
 {
   "projectName": "Compiler Syntax Token Unique Extractor & Categorizer",
   "group": "Group 5",
-  "sourceName": "Default Built-in C++ Demo",
+  "sourceName": "C:\\Users\\dragh\\College projects\\C++Term1_Project\\export\\temp_source.cpp",
   "metrics": {
-    "totalTokensIngested": 226,
+    "totalTokensIngested": 227,
     "totalKeywordOccurrences": 38,
     "uniqueKeywordsCount": 24,
     "duplicateRejectionsCount": 14,
-    "keywordDensityPercentage": 16.81,
+    "keywordDensityPercentage": 16.74,
     "uniquenessRatio": 63.16,
     "duplicateSuppressionRatio": 36.84
   },
@@ -64,7 +64,7 @@
       "category": "Storage Class / Modifier",
       "frequency": 3,
       "relativeFrequencyPercentage": 7.89,
-      "streamPercentage": 1.33
+      "streamPercentage": 1.32
     },
     {
       "keyword": "continue",
@@ -106,7 +106,7 @@
       "category": "Data Type / Primitive",
       "frequency": 7,
       "relativeFrequencyPercentage": 18.42,
-      "streamPercentage": 3.10
+      "streamPercentage": 3.08
     },
     {
       "keyword": "namespace",
@@ -213,19 +213,19 @@
         "category": "KEYWORD",
         "totalCount": 38,
         "uniqueCount": 24,
-        "streamPercentage": 16.81
+        "streamPercentage": 16.74
       },
       {
         "category": "IDENTIFIER",
         "totalCount": 55,
         "uniqueCount": 22,
-        "streamPercentage": 24.34
+        "streamPercentage": 24.23
       },
       {
         "category": "INTEGER_LITERAL",
         "totalCount": 8,
         "uniqueCount": 5,
-        "streamPercentage": 3.54
+        "streamPercentage": 3.52
       },
       {
         "category": "STRING_LITERAL",
@@ -237,19 +237,25 @@
         "category": "OPERATOR",
         "totalCount": 45,
         "uniqueCount": 16,
-        "streamPercentage": 19.91
+        "streamPercentage": 19.82
       },
       {
         "category": "PUNCTUATION",
         "totalCount": 75,
         "uniqueCount": 8,
-        "streamPercentage": 33.19
+        "streamPercentage": 33.04
       },
       {
         "category": "PREPROCESSOR",
         "totalCount": 3,
         "uniqueCount": 3,
-        "streamPercentage": 1.33
+        "streamPercentage": 1.32
+      },
+      {
+        "category": "COMMENT",
+        "totalCount": 1,
+        "uniqueCount": 1,
+        "streamPercentage": 0.44
       }
     ],
     "keywordSubgroups": [
@@ -292,6 +298,7 @@
     ]
   },
   "rawTokens": [
+    "// Default Demonstration C++ Program for Token Extraction",
     "#include <iostream>",
     "#include <vector>",
     "#include <string>",
@@ -520,41 +527,5 @@
     "}"
   ],
   "complexityBenchmarks": [
-    {
-      "tokensN": 500,
-      "uniqueU": 209,
-      "estimatedTreeHeight": 16,
-      "vectorLinearTimeMs": 0.3101,
-      "setTimeMs": 0.1667,
-      "unorderedSetTimeMs": 0.0613,
-      "speedupVsVector": 1.86
-    },
-    {
-      "tokensN": 1500,
-      "uniqueU": 491,
-      "estimatedTreeHeight": 18,
-      "vectorLinearTimeMs": 1.5487,
-      "setTimeMs": 0.4227,
-      "unorderedSetTimeMs": 0.1469,
-      "speedupVsVector": 3.66
-    },
-    {
-      "tokensN": 5000,
-      "uniqueU": 1542,
-      "estimatedTreeHeight": 22,
-      "vectorLinearTimeMs": 9.8417,
-      "setTimeMs": 1.2068,
-      "unorderedSetTimeMs": 0.5061,
-      "speedupVsVector": 8.16
-    },
-    {
-      "tokensN": 15000,
-      "uniqueU": 4595,
-      "estimatedTreeHeight": 26,
-      "vectorLinearTimeMs": 87.1978,
-      "setTimeMs": 3.9210,
-      "unorderedSetTimeMs": 1.6562,
-      "speedupVsVector": 22.24
-    }
   ]
 }
