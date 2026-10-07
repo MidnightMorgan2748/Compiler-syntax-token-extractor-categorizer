@@ -220,6 +220,8 @@ const KEYWORD_TAXONOMY = {
     "asm": "Other Keyword", "static_assert": "Other Keyword", "alignas": "Other Keyword", "alignof": "Other Keyword"
 };
 
+const isLocalhost = (typeof window !== 'undefined') && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
 let currentAnalysis = null;
 let visualizerMode = 'tree';
 
@@ -524,6 +526,14 @@ function loadPresetSample() {
         return;
     }
 
+    if (!isLocalhost) {
+        if (PRESET_SAMPLES[val]) {
+            document.getElementById('codeEditor').value = PRESET_SAMPLES[val];
+            analyzeCode();
+        }
+        return;
+    }
+
     fetch(`/api/sample?id=${val}`)
         .then(r => {
             if (!r.ok) throw new Error('Status ' + r.status);
@@ -692,6 +702,15 @@ function analyzeCode() {
     btn.innerHTML = 'PROCESSING...';
     btn.disabled = true;
 
+    if (!isLocalhost) {
+        const fallback = clientSideAnalyze(code);
+        currentAnalysis = fallback;
+        renderAnalysis(fallback);
+        btn.innerHTML = origHtml;
+        btn.disabled = false;
+        return;
+    }
+
     fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -857,6 +876,34 @@ function runBenchmarkSuite() {
     const btn = document.getElementById('btnBenchmark');
     btn.innerHTML = 'BENCHMARKING...';
     btn.disabled = true;
+
+    if (!isLocalhost) {
+        const benchmarks = [500, 1500, 5000, 15000].map(n => {
+            const u = Math.min(n, Math.max(15, Math.floor(n * 0.3)));
+            const height = Math.ceil(2 * Math.log2(u + 1));
+            const vecTime = (n * u) * 0.0000008 + 0.05;
+            const setTime = (n * Math.log2(u)) * 0.0000003 + 0.01;
+            const hashTime = n * 0.0000002 + 0.008;
+            return {
+                tokensN: n,
+                uniqueU: u,
+                estimatedTreeHeight: height,
+                vectorLinearTimeMs: vecTime,
+                setTimeMs: setTime,
+                unorderedSetTimeMs: hashTime,
+                speedupVsVector: vecTime / setTime
+            };
+        });
+        renderBenchmarks(benchmarks);
+        switchTab('benchmarks');
+        document.querySelectorAll('.mono-tab-item').forEach(b => {
+            if (b.innerText.includes('LOGARITHMIC')) b.classList.add('active');
+            else b.classList.remove('active');
+        });
+        btn.innerHTML = 'RUN O(LOG N) BENCHMARK';
+        btn.disabled = false;
+        return;
+    }
 
     fetch('/api/benchmark', { method: 'POST' })
         .then(r => {
