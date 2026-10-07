@@ -1,0 +1,25 @@
+# Compiled Object Files
+bin/*.obj
+*.obj
+
+# Binaries
+bin/*.exe
+*.exe
+
+# Intermediate / Temp Files
+export/temp_source.cpp
+export/temp_input.cpp
+*.tmp
+*.log
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Editor / IDE configs
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosv
+*.sln.docstates
