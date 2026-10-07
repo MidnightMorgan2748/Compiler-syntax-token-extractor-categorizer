@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compiler Syntax Token Extractor &amp; Categorizer - Group 5</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="mono-app">
+        <header class="mono-header">
+            <div class="mono-brand">
+                <div class="mono-logo">&lambda;</div>
+                <div class="mono-title-group">
+                    <h1>Compiler Syntax Token Extractor &amp; Categorizer</h1>
+                    <div class="sub">Group 5 &bull; STL std::set &bull; std::vector &bull; std::string &bull; C++ Core Engine</div>
+                </div>
+            </div>
+            <div class="mono-system-status">
+                <span class="mono-blink-dot"></span>
+                <span>SYSTEM ONLINE [ :8080 ]</span>
+            </div>
+        </header>
+
+        <section class="mono-viewport-card">
+            <div class="mono-viewport-bar">
+                <div class="mono-viewport-title">
+                    <span>//</span>
+                    <span>3D Binary Syntax Tree &amp; Lexical Space Visualization</span>
+                </div>
+                <div class="mono-viewport-actions">
+                    <button class="mono-btn-v active" id="btnModeTree" onclick="setVisualizerMode('tree')">3D Syntax Tree</button>
+                    <button class="mono-btn-v" id="btnModeVortex" onclick="setVisualizerMode('vortex')">3D Token Stream</button>
+                    <button class="mono-btn-v" onclick="reset3DCamera()">Reset View</button>
+                </div>
+            </div>
+            <div class="mono-canvas-box" id="canvasContainer">
+                <canvas id="treeCanvas"></canvas>
+                <div class="mono-canvas-hud">
+                    <span>NODES: <strong id="hudNodeCount" style="color:var(--text-white)">0</strong></span>
+                    <span>TREE DEPTH: <strong id="hudTreeDepth" style="color:var(--text-white)">0</strong></span>
+                    <span>[ Drag: Orbit 3D &bull; Scroll: Zoom ]</span>
+                </div>
+                <div class="mono-canvas-legend">
+                    <div class="mono-legend-row"><span class="mono-legend-node node-white"></span><span>Primary Node</span></div>
+                    <div class="mono-legend-row"><span class="mono-legend-node node-black"></span><span>Balanced Node</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mono-stats-grid">
+            <div class="mono-stat-box">
+                <div class="mono-stat-label">Ingested Raw Tokens</div>
+                <div class="mono-stat-val" id="cardTokens">0</div>
+                <div class="mono-stat-meta">std::vector&lt;std::string&gt;</div>
+            </div>
+            <div class="mono-stat-box">
+                <div class="mono-stat-label">Unique Syntax Keywords</div>
+                <div class="mono-stat-val" id="cardUniqueKw">0</div>
+                <div class="mono-stat-meta">Isolated by std::set</div>
+            </div>
+            <div class="mono-stat-box">
+                <div class="mono-stat-label">Duplicate Rejections</div>
+                <div class="mono-stat-val" id="cardDuplicates">0</div>
+                <div class="mono-stat-meta">Suppressed via insert()</div>
+            </div>
+            <div class="mono-stat-box">
+                <div class="mono-stat-label">Keyword Density</div>
+                <div class="mono-stat-val" id="cardDensity">0.0%</div>
+                <div class="mono-stat-meta">Keywords / Total Stream</div>
+            </div>
+            <div class="mono-stat-box">
+                <div class="mono-stat-label">Suppression Efficiency</div>
+                <div class="mono-stat-val" id="cardSuppression">0.0%</div>
+                <div class="mono-stat-meta">Duplicates / Total Kwds</div>
+            </div>
+        </section>
+
+        <section class="mono-workbench">
+            <div class="mono-box">
+                <div class="mono-bar">
+                    <div class="mono-bar-title">// Source Code Ingestion Stream</div>
+                    <div class="mono-preset-selector">
+                        <label for="sampleSelect">Preset:</label>
+                        <select id="sampleSelect" onchange="loadPresetSample()">
+                            <option value="demo">Demo Program (OOP &amp; Templates)</option>
+                            <option value="1">Sample 1: Math &amp; Primes</option>
+                            <option value="2">Sample 2: Exceptions &amp; RAII</option>
+                            <option value="3">Sample 3: Keyword Stress &amp; Duplicates</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mono-editor-area">
+                    <textarea id="codeEditor" spellcheck="false" placeholder="Enter or paste C++ source code to analyze..."></textarea>
+                </div>
+                <div class="mono-actions">
+                    <button class="mono-btn btn-white" id="btnAnalyze" onclick="analyzeCode()">
+                        Execute Extraction
+                    </button>
+                    <button class="mono-btn btn-black" id="btnBenchmark" onclick="runBenchmarkSuite()">
+                        Run O(log N) Benchmark
+                    </button>
+                    <button class="mono-btn btn-ghost-mono" onclick="clearCode()">
+                        Clear
+                    </button>
+                </div>
+            </div>
+
+            <div class="mono-box" style="padding: 1.6rem; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div style="font-family: var(--font-mono); font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-white); margin-bottom: 0.8rem;">
+                        // Red-Black Tree Logarithmic Invariants
+                    </div>
+                    <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.2rem;">
+                        <code>std::set&lt;std::string&gt;</code> isolates distinct keys using a Self-Balancing Red-Black Binary Search Tree. Uniqueness verification and insertion complete in strictly logarithmic bounds.
+                    </p>
+                    <div style="background: var(--black-panel); border: 1px solid var(--border-dim); padding: 1.1rem; border-radius: var(--radius-xs); font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-silver); line-height: 1.8;">
+                        <div>[1] Height Bound  : <span style="color:var(--text-white)">h &le; 2 &times; log<sub>2</sub>(U + 1)</span></div>
+                        <div>[2] Insertion Cost: <span style="color:var(--text-white)">O(log U) comparisons</span></div>
+                        <div>[3] Traversal Cost: <span style="color:var(--text-white)">O(N) in-order lexicographical</span></div>
+                        <div>[4] Duplicate Cost: <span style="color:var(--text-white)">O(log U) immediate abort</span></div>
+                    </div>
+                </div>
+                <div style="margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid var(--border-dim); font-size: 0.74rem; font-family: var(--font-mono); color: var(--text-dim); display: flex; justify-content: space-between;">
+                    <span>COMPILER: C++17 MSVC</span>
+                    <span>SCANNER: DETERMINISTIC DFA</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="mono-data-panel">
+            <nav class="mono-tab-nav">
+                <button class="mono-tab-item active" onclick="switchTab('keywords')">Unique Keywords (std::set)</button>
+                <button class="mono-tab-item" onclick="switchTab('categories')">Syntax Categorization</button>
+                <button class="mono-tab-item" onclick="switchTab('benchmarks')">Logarithmic Benchmark</button>
+                <button class="mono-tab-item" onclick="switchTab('tokens')">Ingested Token Stream</button>
+                <button class="mono-tab-item" onclick="switchTab('terminal')">C++ Binary Output</button>
+            </nav>
+
+            <div id="tab-keywords" class="mono-tab-pane active">
+                <div class="mono-table-bar">
+                    <h3>Lexicographically Sorted Syntax Keywords Isolated by std::set</h3>
+                    <input type="text" id="kwSearchInput" class="mono-filter-input" placeholder="Filter keywords..." oninput="filterKeywordTable()">
+                </div>
+                <div class="mono-scroller">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 60px;">#</th>
+                                <th>Keyword (std::set)</th>
+                                <th>Category</th>
+                                <th>Frequency</th>
+                                <th>Keyword Share</th>
+                                <th>Stream Share</th>
+                            </tr>
+                        </thead>
+                        <tbody id="keywordTableBody">
+                            <tr><td colspan="6" class="mono-empty-state">No source code analyzed yet. Click "Execute Extraction" above.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-categories" class="mono-tab-pane">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div>
+                        <div class="mono-table-bar">
+                            <h3>Overall Syntax Token Breakdown</h3>
+                        </div>
+                        <div class="mono-scroller">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>Total Count</th>
+                                        <th>Distinct Items</th>
+                                        <th>Stream Share</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="categoryTableBody">
+                                    <tr><td colspan="4" class="mono-empty-state">Awaiting analysis.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="mono-table-bar">
+                            <h3>Keyword Sub-Taxonomy Breakdown</h3>
+                        </div>
+                        <div class="mono-scroller">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Subgroup</th>
+                                        <th>Total Count</th>
+                                        <th>Distinct (std::set)</th>
+                                        <th>Share</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="kwSubgroupTableBody">
+                                    <tr><td colspan="4" class="mono-empty-state">Awaiting analysis.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-benchmarks" class="mono-tab-pane">
+                <div class="mono-table-bar">
+                    <h3>Empirical Complexity Evaluation: std::set vs Vector Linear Search</h3>
+                    <button class="mono-btn btn-white" style="padding:0.35rem 0.85rem; font-size:0.75rem;" onclick="runBenchmarkSuite()">Re-run Benchmarks</button>
+                </div>
+                <div class="mono-scroller">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tokens (N)</th>
+                                <th>Unique (U)</th>
+                                <th>RB Max Depth &le;</th>
+                                <th>Vector O(N&sup2;) Time</th>
+                                <th>std::set O(N log U) Time</th>
+                                <th>Hash O(N) Time</th>
+                                <th>Speedup Factor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="benchmarkTableBody">
+                            <tr><td colspan="7" class="mono-empty-state">Click "Run O(log N) Benchmark" to trigger performance tests.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-tokens" class="mono-tab-pane">
+                <div class="mono-table-bar">
+                    <h3>Raw Ingested Tokens Sequence (std::vector&lt;std::string&gt;)</h3>
+                    <span id="tokenStreamCount" class="mono-badge badge-solid-white">0 Tokens</span>
+                </div>
+                <div class="mono-token-stream" id="tokenCloud">
+                    <span class="mono-empty-state">Tokens will be streamed here upon analysis.</span>
+                </div>
+            </div>
+
+            <div id="tab-terminal" class="mono-tab-pane">
+                <div class="mono-table-bar">
+                    <h3>Native C++ Executable Terminal Log</h3>
+                </div>
+                <pre class="mono-terminal-box" id="terminalOutput">Click "Execute Extraction" to view native C++ console output...</pre>
+            </div>
+        </section>
+
+        <footer class="mono-footer">
+            <div>Group 5 &bull; Compiler Syntax Token Unique Extractor &amp; Categorizer</div>
+            <div>STL std::set&lt;std::string&gt; &bull; std::vector&lt;std::string&gt;</div>
+        </footer>
+    </div>
+
+    <script src="three.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
